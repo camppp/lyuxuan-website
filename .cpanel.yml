@@ -1,0 +1,8 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/ln2qpu9e4kd6/lyuxuan-website
+    - /bin/mkdir -p /public_html
+    - /bin/cp -r . /public_html
+    - cd /public_html && npm install --production=false
+    - cd /public_html && npm run build
