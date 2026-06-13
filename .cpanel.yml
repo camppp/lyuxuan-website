@@ -5,4 +5,4 @@ deployment:
     - /bin/mkdir -p /public_html
     - /bin/cp -r . /public_html
     - cd /public_html && npm install --production=false
-    - cd /public_html && npm run build
+    - cd /public_html && npm run build && npm run start 
