@@ -2,18 +2,18 @@ import Image from "next/image";
 
 export default function About() {
   return (
-    <section id="about" className="py-14 px-6">
+    <section id="about" className="py-14 px-6 scroll-mt-16">
       <div className="container mx-auto max-w-6xl">
         <h2 className="text-4xl font-bold mb-12 text-center">Just Call Me Yuxuan</h2>
         <div className="grid md:grid-cols-3 gap-12 items-start">
           <div className="md:col-span-1 text-center">
-            <div className="relative w-64 h-64 mx-auto rounded-full overflow-hidden ring-4 ring-zinc-700">
+            <div className="w-64 h-64 mx-auto rounded-full overflow-hidden ring-4 ring-zinc-700">
               <Image
                 src="/images/profile.jpg"
                 alt="Yuxuan Liu"
-                fill
-                className="object-cover"
-                sizes="256px"
+                width={256}
+                height={256}
+                className="object-cover w-full h-full"
                 priority
               />
             </div>

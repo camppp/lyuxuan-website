@@ -85,6 +85,9 @@ export const metadata: Metadata = {
     icon: "/tabIcon.png",
   },
   category: "technology",
+  other: {
+    author: "Yuxuan Liu",
+  },
 };
 
 const personStructuredData = {

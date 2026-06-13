@@ -4,29 +4,46 @@ import { useState, FormEvent } from "react";
 
 type Status = "idle" | "sending" | "success" | "error";
 
+function validateName(v: string) {
+  return v.trim() ? "" : "Name is required.";
+}
+function validateEmail(v: string) {
+  if (!v.trim()) return "Email is required.";
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "" : "Enter a valid email address.";
+}
+function validateMessage(v: string) {
+  return v.trim() ? "" : "Message is required.";
+}
+
 export default function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [touched, setTouched] = useState({ name: false, email: false, message: false });
   const [status, setStatus] = useState<Status>("idle");
+
+  const errors = {
+    name: validateName(name),
+    email: validateEmail(email),
+    message: validateMessage(message),
+  };
+  const isValid = !errors.name && !errors.email && !errors.message;
+
+  function touch(field: keyof typeof touched) {
+    setTouched((t) => ({ ...t, [field]: true }));
+  }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!name || !email || !message) return;
+    setTouched({ name: true, email: true, message: true });
+    if (!isValid) return;
     setStatus("sending");
 
     try {
       const subject = encodeURIComponent(`Portfolio contact from ${name}`);
-      const body = encodeURIComponent(
-        `From: ${name} <${email}>\n\n${message}`
-      );
-      const mailto = `mailto:lyuxuan0422@gmail.com?subject=${subject}&body=${body}`;
-
-      window.location.href = mailto;
-
-      setTimeout(() => {
-        setStatus("success");
-      }, 400);
+      const body = encodeURIComponent(`From: ${name} <${email}>\n\n${message}`);
+      window.location.href = `mailto:lyuxuan0422@gmail.com?subject=${subject}&body=${body}`;
+      setTimeout(() => setStatus("success"), 400);
     } catch {
       setStatus("error");
     }
@@ -57,6 +74,7 @@ export default function ContactForm() {
               setName("");
               setEmail("");
               setMessage("");
+              setTouched({ name: false, email: false, message: false });
             }}
             className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors text-sm"
           >
@@ -81,9 +99,13 @@ export default function ContactForm() {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onBlur={() => touch("name")}
           disabled={isSending}
           className="w-full px-4 py-2 bg-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-rose-600 disabled:opacity-60"
         />
+        {touched.name && errors.name && (
+          <p className="mt-1 text-xs text-rose-400">{errors.name}</p>
+        )}
       </div>
       <div>
         <label htmlFor="contact-email" className="block text-zinc-300 mb-2 text-sm">
@@ -95,9 +117,13 @@ export default function ContactForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onBlur={() => touch("email")}
           disabled={isSending}
           className="w-full px-4 py-2 bg-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-rose-600 disabled:opacity-60"
         />
+        {touched.email && errors.email && (
+          <p className="mt-1 text-xs text-rose-400">{errors.email}</p>
+        )}
       </div>
       <div>
         <label htmlFor="contact-message" className="block text-zinc-300 mb-2 text-sm">
@@ -108,13 +134,17 @@ export default function ContactForm() {
           required
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onBlur={() => touch("message")}
           disabled={isSending}
           className="w-full px-4 py-2 bg-zinc-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-rose-600 h-32 resize-none disabled:opacity-60"
         />
+        {touched.message && errors.message && (
+          <p className="mt-1 text-xs text-rose-400">{errors.message}</p>
+        )}
       </div>
       <button
         type="submit"
-        disabled={isSending}
+        disabled={isSending || !isValid}
         className="w-full px-8 py-3 bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors font-semibold disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {isSending ? (

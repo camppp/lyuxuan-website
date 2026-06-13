@@ -20,7 +20,7 @@ export default function Footer() {
             LinkedIn
           </a>
         </div>
-        <p className="text-zinc-500 text-sm">© 2026 Yuxuan Liu. All rights reserved.</p>
+        <p className="text-zinc-500 text-sm">© {new Date().getFullYear()} Yuxuan Liu. All rights reserved.</p>
       </div>
     </footer>
   );

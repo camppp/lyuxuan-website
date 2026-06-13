@@ -1,8 +1,9 @@
+import { Mail, Phone, MapPin } from "lucide-react";
 import ContactForm from "./ContactForm";
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-14 px-6">
+    <section id="contact" className="py-8 px-6 scroll-mt-16">
       <div className="container mx-auto max-w-5xl">
         <h2 className="text-4xl font-bold mb-2 text-center">Get in Touch</h2>
         <p className="text-center text-zinc-400 mb-10">
@@ -25,7 +26,7 @@ export default function Contact() {
                   className="flex items-center gap-3 text-zinc-300 hover:text-rose-400 transition-colors group"
                 >
                   <span className="flex-shrink-0 w-9 h-9 rounded-md bg-rose-600/15 text-rose-400 flex items-center justify-center group-hover:bg-rose-600/25 transition-colors">
-                    ✉
+                    <Mail className="w-5 h-5" />
                   </span>
                   <span className="text-sm break-all">lyuxuan0422@gmail.com</span>
                 </a>
@@ -34,13 +35,13 @@ export default function Contact() {
                   className="flex items-center gap-3 text-zinc-300 hover:text-rose-400 transition-colors group"
                 >
                   <span className="flex-shrink-0 w-9 h-9 rounded-md bg-rose-600/15 text-rose-400 flex items-center justify-center group-hover:bg-rose-600/25 transition-colors">
-                    ☎
+                    <Phone className="w-5 h-5" />
                   </span>
                   <span className="text-sm">+1 (608) 422-2040</span>
                 </a>
                 <div className="flex items-center gap-3 text-zinc-300">
                   <span className="flex-shrink-0 w-9 h-9 rounded-md bg-rose-600/15 text-rose-400 flex items-center justify-center">
-                    ⚲
+                    <MapPin className="w-5 h-5" />
                   </span>
                   <span className="text-sm">Los Angeles, CA</span>
                 </div>

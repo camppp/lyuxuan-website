@@ -12,6 +12,13 @@ export const metadata: Metadata = {
     "Real-time bus tracker for the Madison, WI Metro Transit network. An undergraduate project by Yuxuan Liu, originally built in 2018 and ported to Next.js.",
   alternates: { canonical: "/madbus" },
   robots: { index: true, follow: true },
+  openGraph: {
+    title: "MadBus — Real-Time Madison Bus Tracker",
+    description:
+      "Real-time bus tracker for the Madison, WI Metro Transit network. Originally built in 2018, ported to Next.js.",
+    url: "https://www.lyuxuan.com/madbus",
+    images: [{ url: "/images/profile.jpg", width: 1200, height: 630, alt: "MadBus by Yuxuan Liu" }],
+  },
 };
 
 export default function MadBusPage() {

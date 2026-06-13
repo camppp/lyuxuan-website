@@ -73,7 +73,7 @@ function NpmIcon() {
 
 export default function Projects() {
   return (
-    <section id="projects" className="py-14 px-6">
+    <section id="projects" className="py-8 px-6 scroll-mt-16">
       <div className="container mx-auto max-w-6xl">
         <h2 className="text-4xl font-bold mb-4 text-center">Projects</h2>
         <p className="text-center text-zinc-400 mb-10">
