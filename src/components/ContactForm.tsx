@@ -33,17 +33,20 @@ export default function ContactForm() {
     setTouched((t) => ({ ...t, [field]: true }));
   }
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setTouched({ name: true, email: true, message: true });
     if (!isValid) return;
     setStatus("sending");
 
     try {
-      const subject = encodeURIComponent(`Portfolio contact from ${name}`);
-      const body = encodeURIComponent(`From: ${name} <${email}>\n\n${message}`);
-      window.location.href = `mailto:lyuxuan0422@gmail.com?subject=${subject}&body=${body}`;
-      setTimeout(() => setStatus("success"), 400);
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+      if (!res.ok) throw new Error();
+      setStatus("success");
     } catch {
       setStatus("error");
     }
@@ -55,10 +58,9 @@ export default function ContactForm() {
         <div className="w-14 h-14 rounded-full bg-rose-600/20 flex items-center justify-center text-rose-400 text-2xl mb-4">
           ✓
         </div>
-        <h3 className="text-xl font-bold mb-2">Email client opened</h3>
+        <h3 className="text-xl font-bold mb-2">Message sent!</h3>
         <p className="text-zinc-300 mb-6 max-w-sm">
-          Your default email client should have opened with your message ready to send.
-          If nothing happened, you can email me directly.
+          Thanks for reaching out. I&apos;ll get back to you soon.
         </p>
         <div className="flex gap-3">
           <a
@@ -150,7 +152,7 @@ export default function ContactForm() {
         {isSending ? (
           <>
             <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-            <span>Opening email…</span>
+            <span>Sending…</span>
           </>
         ) : (
           <span>Send Message</span>
