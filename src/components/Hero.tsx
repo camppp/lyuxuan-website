@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ResumeButton } from "./ResumeButton";
 
 export default function Hero() {
   return (
@@ -37,14 +38,7 @@ export default function Hero() {
           >
             Who am I?
           </a>
-          <a
-            href="/resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-8 py-3 bg-rose-600 hover:bg-rose-700 rounded-lg transition-colors font-semibold"
-          >
-            View Resume
-          </a>
+          <ResumeButton />
         </div>
       </div>
     </section>
