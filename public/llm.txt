@@ -1,0 +1,99 @@
+# Yuxuan Liu — Software Engineer
+
+Senior Software Engineer (Test Automation) at Spokeo, based in Los Angeles, CA.
+Previously at Amazon, SiriusXM, PerBlue, Baidu, and NavInfo.
+Master's in Computer Science from UIUC (pursued to specialize in AI/ML).
+
+Website: https://www.lyuxuan.com
+LinkedIn: https://www.linkedin.com/in/lyuxuan/
+GitHub: https://github.com/camppp
+Resume: https://www.lyuxuan.com/resume.pdf
+
+---
+
+## Experience
+
+**Spokeo** — Senior Software Engineer, Test Automation (Feb 2024 – Present, Pasadena, CA)
+- Leading test automation with Cypress, TypeScript, RSpec, and Ruby
+- Built and open-sourced cypress-parallel-fast (npm) — dynamic task-queue parallelization for Cypress
+- Built @camppp/cypress-to-playwright (npm) — runtime command translation for Cypress → Playwright migration
+- Driving CI/CD improvements with Docker and Jenkins
+
+**Amazon** — Software Development Engineer I (Jul 2021 – Jul 2022, Greater Seattle Area)
+- Designed payments core back-end in Java and AWS for payment method management and processing
+- Decomposed registry into RESTful microservices, event processors, and NoSQL metadata stores
+- Launched core logic in the "Just Walk Out" experiment for Amazon Go / Fresh / Whole Foods (10K+ TPS)
+- Integrated payment processing with Amazon's biometrics platform
+
+**SiriusXM** — Software Engineer Intern (May 2023 – Aug 2023, Urbana-Champaign, IL)
+- Designed event-driven monitoring pipeline using AWS Lambda, Node.js, and CloudFormation
+- Reduced cloud monitoring costs by 95% by eliminating manual CloudWatch Insights scheduling
+- Built serverless infrastructure for S3 record loading/preprocessing with Lambda and SNS
+- Designed Kibana dashboards and developed analytics logic with KQL
+
+**PerBlue** — Software Engineer Intern (May 2020 – Aug 2020, Madison, WI)
+- Developed back-end features of a cross-platform mobile game using the C# Orleans framework
+
+**Baidu** — Software Engineer Intern (May 2019 – Aug 2019, Beijing, China)
+- Built data pipelines across Apache Hive, Redis, and MySQL using HiveQL, SQL, and DataX
+- Optimized Hive partitioning, reducing petabyte-scale daily jobs from 10h to 3h (–40% peak usage)
+
+**NavInfo** — Software Engineer Intern (May 2018 – Aug 2018, Beijing, China)
+- Developed a Kalman filter-based GPS noise filtering solution in Java
+- Implemented a Hadoop-based route distance service over HDFS-stored coordinates
+- Optimized Elasticsearch instances used for Geoshape intersection
+
+---
+
+## Skills
+
+**Languages:** Python, Java, TypeScript, JavaScript, C++, Ruby, C#, C, PHP, SQL
+**Frameworks:** Next.js, React, Node.js, Spring Boot, Rails, Tailwind CSS, PyTorch, OpenCV, Unity
+**Cloud & DevOps:** AWS, AWS Lambda, CloudFormation, Docker, Kubernetes, Jenkins, GitHub Actions, Linux, Git, Microservices, REST APIs
+**AI & ML:** Generative AI, LLM Integration, OpenAI API, Prompt Engineering, Machine Learning, Deep Learning, Computer Vision
+**Data Engineering:** Apache Spark, Apache Hive, Hadoop, Elasticsearch, PostgreSQL, MySQL, Redis, Kibana, NoSQL, Big Data, Distributed Computing
+**Testing:** Cypress, Playwright, RSpec, Selenium, Percy, Testkube
+
+---
+
+## Certifications
+
+- AWS Certified Solutions Architect – Associate — https://www.credly.com/badges/a305466b-7a24-4bcc-a11d-b4fe14afb675/public_url
+- Oracle Certified Professional, Java SE 11 Developer — https://www.credly.com/badges/971aeddc-8113-4dee-b94c-f28bf9ddd4b7/public_url
+
+---
+
+## Open Source Projects
+
+**cypress-parallel-fast** (npm: cypress-parallel-fast)
+Parallelize Cypress test cases within and across spec files using a dynamic task queue.
+https://github.com/camppp/cypress-parallel-fast | https://www.npmjs.com/package/cypress-parallel-fast
+
+**@camppp/cypress-to-playwright** (npm: @camppp/cypress-to-playwright)
+Translates Cypress commands to Playwright equivalents at runtime for gradual migration.
+https://github.com/camppp/cypress-to-playwright | https://www.npmjs.com/package/@camppp/cypress-to-playwright
+
+**EVA — Erroneous Vector Assessment**
+Weightlifting form correction app using computer vision and pose estimation.
+https://github.com/camppp/EVA
+
+**Video Style Transfer**
+Deep learning video style transfer built on StyTR-2, extending transformer-based image style transfer to the temporal domain.
+https://github.com/camppp/StyTR-2
+
+**MadBus — Real-Time Bus Tracker**
+Real-time bus tracker for Madison, WI Metro Transit. Built in PHP/JS in 2018, ported to Next.js.
+https://github.com/camppp/MadBus | Live: https://www.lyuxuan.com/madbus
+
+---
+
+## Pages
+
+- / — Portfolio homepage
+- /#about — About Yuxuan
+- /#experience — Work history
+- /#skills — Technical skills and certifications
+- /#projects — Open-source projects
+- /#contact — Contact form
+- /madbus — Live MadBus demo
+- /resume.pdf — Resume (PDF)
