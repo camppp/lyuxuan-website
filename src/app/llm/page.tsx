@@ -33,12 +33,26 @@ function Chat({ savedPassword, onSignOut }: { savedPassword: string; onSignOut: 
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
-      <div className="border-b border-zinc-800 px-4 py-3 flex items-center justify-between max-w-3xl w-full mx-auto gap-4">
-        <div className="flex items-center gap-2 min-w-0">
-          <h1 className="font-bold text-rose-400 shrink-0">66&apos;s AI 助手</h1>
+      <div className="border-b border-zinc-800 px-4 py-3 max-w-3xl w-full mx-auto">
+        {/* Row 1: title + actions */}
+        <div className="flex items-center justify-between gap-4 mb-2">
+          <h1 className="font-bold text-rose-400">66 AI 助手</h1>
+          <div className="flex gap-4">
+            {messages.length > 0 && (
+              <button onClick={clearChat} className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
+                清空对话
+              </button>
+            )}
+            <button onClick={onSignOut} className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
+              退出
+            </button>
+          </div>
+        </div>
 
+        {/* Row 2: toggles */}
+        <div className="flex items-center gap-2">
           {/* Provider toggle */}
-          <div className="flex rounded-lg overflow-hidden border border-zinc-700 text-xs shrink-0">
+          <div className="flex rounded-lg overflow-hidden border border-zinc-700 text-xs">
             {(Object.keys(PROVIDER_MODELS) as Provider[]).map(p => (
               <button
                 key={p}
@@ -54,7 +68,7 @@ function Chat({ savedPassword, onSignOut }: { savedPassword: string; onSignOut: 
           </div>
 
           {/* Tier toggle */}
-          <div className="flex rounded-lg overflow-hidden border border-zinc-700 text-xs shrink-0">
+          <div className="flex rounded-lg overflow-hidden border border-zinc-700 text-xs">
             {TIERS.map((label, i) => (
               <button
                 key={label}
@@ -68,17 +82,6 @@ function Chat({ savedPassword, onSignOut }: { savedPassword: string; onSignOut: 
               </button>
             ))}
           </div>
-        </div>
-
-        <div className="flex gap-4 shrink-0">
-          {messages.length > 0 && (
-            <button onClick={clearChat} className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
-              清空对话
-            </button>
-          )}
-          <button onClick={onSignOut} className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
-            退出
-          </button>
         </div>
       </div>
       <MessageList messages={messages} streaming={streaming} />
