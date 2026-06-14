@@ -31,12 +31,9 @@ interface StopFeature {
   };
 }
 
-interface StopResponse {
-  features: StopFeature[];
-}
-
-interface RouteShape {
+interface PatternResponse {
   points: [number, number][];
+  features: StopFeature[];
 }
 
 const USER_LATLNG: L.LatLngExpression = [43.071302, -89.407001];
@@ -57,6 +54,7 @@ export default function MadBusMap() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const vehicleLayerRef = useRef<L.LayerGroup | null>(null);
   const routeLayerRef = useRef<L.LayerGroup | null>(null);
+  const stopsRef = useRef<StopFeature[]>([]);
 
   const [routes, setRoutes] = useState<Record<string, Route>>({});
   const [selectedRoute, setSelectedRoute] = useState("");
@@ -85,7 +83,6 @@ export default function MadBusMap() {
     vehicleLayerRef.current = L.layerGroup().addTo(map);
     routeLayerRef.current = L.layerGroup().addTo(map);
 
-    // User marker
     L.marker(USER_LATLNG, {
       icon: L.divIcon({
         className: "madbus-icon",
@@ -121,8 +118,10 @@ export default function MadBusMap() {
       .catch(() => setError("Failed to load routes"));
   }, []);
 
-  // Poll vehicles
+  // Poll vehicles — pauses when tab is hidden
   useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+
     const load = async () => {
       try {
         const res = await fetch("/api/madbus/vehicles");
@@ -130,7 +129,6 @@ export default function MadBusMap() {
 
         if (!vehicleLayerRef.current || !mapRef.current) return;
 
-        // Clear old
         vehicleLayerRef.current.clearLayers();
 
         data.entity.forEach((v) => {
@@ -154,12 +152,21 @@ export default function MadBusMap() {
       }
     };
 
+    const start = () => { interval = setInterval(load, 30_000); };
+    const stop = () => clearInterval(interval);
+    const onVisibilityChange = () => document.hidden ? stop() : (load(), start());
+
     load();
-    const interval = setInterval(load, 5000);
-    return () => clearInterval(interval);
+    start();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, []);
 
-  // Display selected route
+  // Display selected route — single upstream call for both shape and stops
   const displayRoute = useCallback(async () => {
     if (!selectedRoute || !routeLayerRef.current) return;
 
@@ -168,36 +175,33 @@ export default function MadBusMap() {
     setError(null);
 
     try {
-      const [shapeRes, stopsRes] = await Promise.all([
-        fetch(`/api/madbus/route-shape?route=${selectedRoute}`),
-        fetch(`/api/madbus/stops?chosen=${selectedRoute}`),
-      ]);
+      const res = await fetch(`/api/madbus/pattern?route=${selectedRoute}`);
+      const body = await res.json();
 
-      const shapeData: RouteShape = await shapeRes.json();
-      const stopsData: StopResponse = await stopsRes.json();
+      if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
+
+      const { points = [], features = [] }: PatternResponse = body;
+      stopsRef.current = features;
 
       const color = colormapRef.current.get(selectedRoute) || "#1e90ff";
 
-      if (shapeData.points.length > 0) {
-        L.polyline(shapeData.points, { color, weight: 4, opacity: 0.9 }).addTo(routeLayerRef.current);
+      if (points.length > 0) {
+        L.polyline(points, { color, weight: 4, opacity: 0.9 }).addTo(routeLayerRef.current);
       }
 
-      if (stopsData.features?.length) {
-        stopsData.features.forEach((s) => {
-          L.circleMarker([s.attributes.stop_lat, s.attributes.stop_lon], {
-            radius: 5,
-            fillColor: color,
-            color: "white",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8,
-          })
-            .bindPopup(`<strong>${s.attributes.stop_name}</strong><br/>Stop ID: ${s.attributes.stop_id}`)
-            .addTo(routeLayerRef.current!);
-        });
-      }
+      features?.forEach((s) => {
+        L.circleMarker([s.attributes.stop_lat, s.attributes.stop_lon], {
+          radius: 5,
+          fillColor: color,
+          color: "white",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8,
+        })
+          .bindPopup(`<strong>${s.attributes.stop_name}</strong><br/>Stop ID: ${s.attributes.stop_id}`)
+          .addTo(routeLayerRef.current!);
+      });
 
-      // Fit bounds to route
       const group = new L.FeatureGroup();
       routeLayerRef.current.eachLayer((layer) => group.addLayer(layer));
       if (group.getLayers().length > 0) {
@@ -210,28 +214,23 @@ export default function MadBusMap() {
     }
   }, [selectedRoute]);
 
-  // Clear route
   const clearRoute = useCallback(() => {
     setSelectedRoute("");
+    stopsRef.current = [];
     routeLayerRef.current?.clearLayers();
     mapRef.current?.setView(MAP_CENTER, 14);
   }, []);
 
-  // Find closest stops
-  const showClosest = useCallback(async () => {
-    if (!routeLayerRef.current || !selectedRoute) return;
-
-    const stopsRes = await fetch(`/api/madbus/stops?chosen=${selectedRoute}`);
-    const stopsData: StopResponse = await stopsRes.json();
+  // Uses stops cached by displayRoute — no network request
+  const showClosest = useCallback(() => {
+    const stops = stopsRef.current;
+    if (!stops.length || !mapRef.current) return;
 
     let closest: StopFeature | undefined;
     let minDist = Infinity;
 
-    for (const s of stopsData.features || []) {
-      const d = haversine(
-        43.071302, -89.407001,
-        s.attributes.stop_lat, s.attributes.stop_lon
-      );
+    for (const s of stops) {
+      const d = haversine(43.071302, -89.407001, s.attributes.stop_lat, s.attributes.stop_lon);
       if (d < minDist) {
         minDist = d;
         closest = s;
@@ -239,9 +238,9 @@ export default function MadBusMap() {
     }
 
     if (closest) {
-      mapRef.current?.flyTo([closest.attributes.stop_lat, closest.attributes.stop_lon], 16);
+      mapRef.current.flyTo([closest.attributes.stop_lat, closest.attributes.stop_lon], 16);
     }
-  }, [selectedRoute]);
+  }, []);
 
   return (
     <div>
@@ -298,12 +297,6 @@ export default function MadBusMap() {
         style={{ width: "100%", height: 600, background: "#888" }}
       />
 
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .madbus-icon { display: block !important; position: absolute; }
-          .madbus-icon svg { display: block !important; width: 100%; height: 100%; }
-        `
-      }} />
     </div>
   );
 }

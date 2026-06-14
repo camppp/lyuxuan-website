@@ -30,27 +30,8 @@ export default function MadBusPage() {
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossOrigin=""
       />
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .madbus-icon {
-            display: block !important;
-            position: absolute;
-          }
-          .madbus-icon svg {
-            display: block !important;
-            width: 100%;
-            height: 100%;
-          }
-          .madbus-icon svg rect {
-            display: block !important;
-          }
-          .madbus-icon svg text {
-            display: block !important;
-          }
-        `
-      }} />
 
-      <main className="min-h-screen bg-zinc-900 text-white pt-16">
+<main className="min-h-screen bg-zinc-900 text-white pt-16">
         <div className="container mx-auto px-6 py-8 max-w-5xl">
           <div className="mb-6">
             <a

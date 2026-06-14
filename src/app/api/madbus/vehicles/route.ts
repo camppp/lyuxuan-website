@@ -1,83 +1,74 @@
 import { NextResponse } from "next/server";
+import { loadRoutes, API_KEY } from "../shared";
 
-const API_KEY = process.env.MADBUS_API_KEY;
+const VEHICLE_CACHE_TTL = 30_000; // 30 seconds — 5,760 upstream requests/day vs 34,560 at 5s
+let vehicleCache: object | null = null;
+let vehicleCacheTime = 0;
 
-export const revalidate = 5;
+function chunk<T>(arr: T[], size: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
 
-// Convert v3 XML vehicle data to GTFS-Realtime-like format
-function parseVehicleXML(xml: string, routeId: string) {
-  const vehicles: any[] = [];
-  const vehicleRegex = /<vehicle>\s*<vid>([^<]+)<\/vid>\s*<tmstmp>([^<]+)<\/tmstmp>\s*<lat>([^<]+)<\/lat>\s*<lon>([^<]+)<\/lon>/g;
-  let match;
-  while ((match = vehicleRegex.exec(xml)) !== null) {
-    vehicles.push({
-      id: match[1],
-      timestamp: match[2],
-      position: {
-        latitude: parseFloat(match[3]),
-        longitude: parseFloat(match[4]),
-      },
-      vehicle: {
-        id: match[1],
-        route_id: routeId,
-      },
-    });
+function parseVehicleXML(xml: string) {
+  const vehicles: { id: string; route_id: string; lat: number; lon: number }[] = [];
+  const blockRe = /<vehicle>([\s\S]*?)<\/vehicle>/g;
+  let block;
+  while ((block = blockRe.exec(xml)) !== null) {
+    const inner = block[1];
+    const vid = inner.match(/<vid>([^<]+)<\/vid>/)?.[1];
+    const lat = inner.match(/<lat>([^<]+)<\/lat>/)?.[1];
+    const lon = inner.match(/<lon>([^<]+)<\/lon>/)?.[1];
+    const rt = inner.match(/<rt>([^<]+)<\/rt>/)?.[1];
+    if (vid && lat && lon && rt) {
+      vehicles.push({ id: vid, route_id: rt, lat: parseFloat(lat), lon: parseFloat(lon) });
+    }
   }
   return vehicles;
 }
 
 export async function GET() {
-  if (!API_KEY) {
-    return NextResponse.json({ error: "API key not configured" }, { status: 500 });
-  }
-  try {
-    // Get all routes first
-    const routesRes = await fetch(
-      `https://metromap.cityofmadison.com/bustime/api/v3/getroutes?key=${API_KEY}`
-    );
-    const routesText = await routesRes.text();
-    
-    // Extract route IDs
-    const routeIds: string[] = [];
-    const routeRegex = /<rt>([^<]+)<\/rt>/g;
-    let match;
-    while ((match = routeRegex.exec(routesText)) !== null) {
-      routeIds.push(match[1]);
-    }
+  if (!API_KEY) return NextResponse.json({ error: "API key not configured" }, { status: 500 });
 
-    // Get vehicles for each route in parallel
-    const vehiclePromises = routeIds.map(async (rt) => {
-      try {
-        const vehiclesRes = await fetch(
-          `https://metromap.cityofmadison.com/bustime/api/v3/getvehicles?key=${API_KEY}&rt=${rt}`
-        );
-        const vehiclesText = await vehiclesRes.text();
-        return parseVehicleXML(vehiclesText, rt);
-      } catch (e) {
-        console.error(`Failed to get vehicles for route ${rt}:`, e);
-        return [];
-      }
+  if (vehicleCache && Date.now() - vehicleCacheTime < VEHICLE_CACHE_TTL) {
+    return NextResponse.json(vehicleCache, {
+      headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=10" },
     });
+  }
 
-    const vehicleResults = await Promise.all(vehiclePromises);
-    const allVehicles = vehicleResults.flat();
+  try {
+    const routes = await loadRoutes();
+    const batches = chunk(Object.keys(routes), 10);
 
-    // Return in GTFS-Realtime format
-    return NextResponse.json({
-      header: {
-        gtfs_realtime_version: "2.0",
-        incrementality: 0,
-        timestamp: Math.floor(Date.now() / 1000),
-      },
-      entity: allVehicles.map((v) => ({
+    const results = await Promise.all(
+      batches.map(async (batch) => {
+        const res = await fetch(
+          `https://metromap.cityofmadison.com/bustime/api/v3/getvehicles?key=${API_KEY}&rt=${batch.join(",")}`
+        );
+        return parseVehicleXML(await res.text());
+      })
+    );
+
+    const now = Math.floor(Date.now() / 1000);
+    const body = {
+      header: { gtfs_realtime_version: "2.0", incrementality: 0, timestamp: now },
+      entity: results.flat().map((v) => ({
         id: v.id,
         vehicle: {
-          id: v.vehicle.id,
-          trip: { route_id: v.vehicle.route_id },
-          position: v.position,
+          id: v.id,
+          trip: { route_id: v.route_id },
+          position: { latitude: v.lat, longitude: v.lon },
         },
-        timestamp: Math.floor(Date.now() / 1000),
+        timestamp: now,
       })),
+    };
+
+    vehicleCache = body;
+    vehicleCacheTime = Date.now();
+
+    return NextResponse.json(body, {
+      headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=10" },
     });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 502 });
