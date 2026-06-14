@@ -46,7 +46,7 @@ export function MessageList({ messages, streaming }: { messages: Message[]; stre
   return (
     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 max-w-3xl w-full mx-auto">
       {messages.length === 0 && (
-        <p className="text-center text-zinc-500 text-sm mt-16">有什么可以帮你的？</p>
+        <p className="text-center text-zinc-500 text-sm mt-16">啥也没有啊...</p>
       )}
       {messages.map((msg, i) => (
         <MessageBubble

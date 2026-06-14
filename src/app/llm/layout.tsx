@@ -5,6 +5,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function GptLayout({ children }: { children: React.ReactNode }) {
+export default function LlmLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

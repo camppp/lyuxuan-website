@@ -6,6 +6,19 @@ const topSkills = [
   "Python",
 ];
 
+const certifications = [
+  {
+    name: "AWS Certified Solutions Architect – Associate",
+    issuer: "Amazon Web Services",
+    url: "https://www.credly.com/badges/a305466b-7a24-4bcc-a11d-b4fe14afb675/public_url",
+  },
+  {
+    name: "Oracle Certified Professional, Java SE 11 Developer",
+    issuer: "Oracle",
+    url: "https://www.credly.com/badges/971aeddc-8113-4dee-b94c-f28bf9ddd4b7/public_url",
+  },
+];
+
 const categories: {
   title: string;
   icon: string;
@@ -14,76 +27,32 @@ const categories: {
   {
     title: "Languages",
     icon: "{ }",
-    items: [
-      "Java",
-      "Python",
-      "TypeScript",
-      "JavaScript",
-      "Ruby",
-      "C#",
-      "C",
-      "PHP",
-      "SQL",
-      "HiveQL",
-    ],
+    items: ["Python", "Java", "TypeScript", "JavaScript", "C++", "Ruby", "C#", "C", "PHP", "SQL"],
   },
   {
-    title: "Testing & Automation",
-    icon: "✓",
-    items: ["Cypress", "RSpec", "Jenkins", "Test Automation", "CI/CD"],
+    title: "Frameworks",
+    icon: "▲",
+    items: ["Next.js", "React", "Node.js", "Spring Boot", "Rails", "Tailwind CSS", "HTML/CSS", "PyTorch", "OpenCV", "Unity"],
   },
   {
     title: "Cloud & DevOps",
     icon: "☁",
-    items: [
-      "AWS",
-      "AWS Lambda",
-      "CloudFormation",
-      "Docker",
-      "Linux",
-      "Unix",
-      "Git",
-    ],
+    items: ["AWS", "AWS Lambda", "CloudFormation", "Docker", "Kubernetes", "Jenkins", "GitHub Actions", "Linux", "Git", "Microservices", "REST APIs"],
   },
   {
-    title: "Frameworks & Libraries",
-    icon: "▲",
-    items: [
-      "React.js",
-      "Node.js",
-      "Spring Boot",
-      ".NET Framework",
-      "Unity",
-      "PyTorch",
-      "OpenCV",
-    ],
-  },
-  {
-    title: "Data & ML",
+    title: "AI & ML",
     icon: "◆",
-    items: [
-      "Apache Hive",
-      "Apache Spark",
-      "Elasticsearch",
-      "Redis",
-      "MySQL",
-      "Kibana",
-      "Machine Learning",
-      "Deep Learning",
-      "Big Data",
-      "Distributed Computing",
-    ],
+    items: ["Generative AI", "LLM Integration", "OpenAI API", "Prompt Engineering", "Machine Learning", "Deep Learning", "Computer Vision"],
   },
   {
-    title: "Domains",
+    title: "Data Engineering",
     icon: "◎",
-    items: [
-      "Payment Systems",
-      "Computer Vision",
-      "Game Development",
-      "IoT",
-      "Android Development",
-    ],
+    items: ["Apache Spark", "Apache Hive", "Hadoop", "Elasticsearch", "PostgreSQL", "MySQL", "Redis", "Kibana", "NoSQL", "Big Data", "Distributed Computing"],
+  },
+  {
+    title: "Testing",
+    icon: "✓",
+    items: ["Cypress", "Playwright", "RSpec", "Selenium", "Percy", "Testkube"],
   },
 ];
 
@@ -97,7 +66,7 @@ export default function Skills() {
         </p>
 
         {/* Top skills - LinkedIn endorsed */}
-        <div className="mb-12">
+        <div className="mb-8">
           <p className="text-sm uppercase tracking-wider text-rose-400 text-center mb-4 font-semibold">
             Top Skills · Endorsed on LinkedIn
           </p>
@@ -114,7 +83,7 @@ export default function Skills() {
         </div>
 
         {/* Categorized skill grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {categories.map((cat) => (
             <div
               key={cat.title}
@@ -138,6 +107,30 @@ export default function Skills() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Certifications */}
+        <div className="mt-10">
+          <p className="text-sm uppercase tracking-wider text-rose-400 text-center mb-4 font-semibold">
+            Certifications
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            {certifications.map((cert) => (
+              <a
+                key={cert.name}
+                href={cert.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-5 py-3 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-rose-500/40 transition-colors"
+              >
+                <span className="text-rose-400 text-lg">🏅</span>
+                <div>
+                  <p className="text-sm font-semibold text-white">{cert.name}</p>
+                  <p className="text-xs text-zinc-400">{cert.issuer}</p>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -13,7 +13,7 @@ export function PasswordGate({ onSuccess }: { onSuccess: (password: string) => v
     setChecking(true);
     setError(false);
 
-    const res = await fetch("/api/gpt", {
+    const res = await fetch("/api/llm", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ messages: [], password: value }),

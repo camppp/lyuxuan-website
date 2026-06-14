@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect, FormEvent } from "react";
 
 export type Message = { role: "user" | "assistant"; content: string };
 
-export function useChat(savedPassword: string) {
+export function useChat(savedPassword: string, model: string) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -26,13 +26,17 @@ export function useChat(savedPassword: string) {
     setStreaming(true);
 
     try {
-      const res = await fetch("/api/gpt", {
+      const res = await fetch("/api/llm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history, password: savedPassword }),
+        body: JSON.stringify({ messages: history, password: savedPassword, model }),
       });
 
-      if (!res.ok || !res.body) throw new Error();
+      if (!res.ok || !res.body) {
+        const body = await res.json().catch(() => ({}));
+        const msg = body.error ?? body.message ?? `Error ${res.status}`;
+        throw new Error(msg);
+      }
 
       const reader = res.body.getReader();
       readerRef.current = reader;
@@ -58,17 +62,18 @@ export function useChat(savedPassword: string) {
           } catch {}
         }
       }
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "出错了，请重试。";
       setMessages(m => {
         const copy = [...m];
-        copy[copy.length - 1] = { role: "assistant", content: "出错了，请重试。" };
+        copy[copy.length - 1] = { role: "assistant", content: `⚠️ ${msg}` };
         return copy;
       });
     } finally {
       readerRef.current = null;
       setStreaming(false);
     }
-  }, [input, streaming, savedPassword]);
+  }, [input, streaming, savedPassword, model]);
 
   return { messages, input, setInput, streaming, handleSend, clearChat };
 }
