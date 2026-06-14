@@ -35,7 +35,7 @@ function Chat({ savedPassword, onSignOut }: { savedPassword: string; onSignOut: 
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
       <div className="border-b border-zinc-800 px-4 py-3 flex items-center justify-between max-w-3xl w-full mx-auto gap-4">
         <div className="flex items-center gap-2 min-w-0">
-          <h1 className="font-bold text-rose-400 shrink-0">66's AI 助手</h1>
+          <h1 className="font-bold text-rose-400 shrink-0">66&apos;s AI 助手</h1>
 
           {/* Provider toggle */}
           <div className="flex rounded-lg overflow-hidden border border-zinc-700 text-xs shrink-0">

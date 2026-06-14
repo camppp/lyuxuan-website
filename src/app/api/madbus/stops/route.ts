@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const res = await fetch(url);
     const text = await res.text();
 
-    const stops: any[] = [];
+    const stops: { stop_id: string; stop_name: string; stop_lat: number; stop_lon: number; seq: number }[] = [];
     
     // Extract stops from patterns - stops have typ=S with stpid and stpnm
     const stopRegex = /<pt>\s*<seq>([^<]+)<\/seq>\s*<lat>([^<]+)<\/lat>\s*<lon>([^<]+)<\/lon>\s*<typ>S<\/typ>\s*<stpid>([^<]+)<\/stpid>\s*<stpnm>([^<]+)<\/stpnm>/g;
