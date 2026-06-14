@@ -54,11 +54,14 @@ export default function MadBusMap() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const vehicleLayerRef = useRef<L.LayerGroup | null>(null);
   const routeLayerRef = useRef<L.LayerGroup | null>(null);
+  const userMarkerRef = useRef<L.Marker | null>(null);
+  const userLatLngRef = useRef<[number, number]>([43.071302, -89.407001]);
   const stopsRef = useRef<StopFeature[]>([]);
 
   const [routes, setRoutes] = useState<Record<string, Route>>({});
   const [selectedRoute, setSelectedRoute] = useState("");
   const [loadingRoutes, setLoadingRoutes] = useState(false);
+  const [locating, setLocating] = useState(false);
   const [vehicleCount, setVehicleCount] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +86,7 @@ export default function MadBusMap() {
     vehicleLayerRef.current = L.layerGroup().addTo(map);
     routeLayerRef.current = L.layerGroup().addTo(map);
 
-    L.marker(USER_LATLNG, {
+    userMarkerRef.current = L.marker(USER_LATLNG, {
       icon: L.divIcon({
         className: "madbus-icon",
         html: '<svg width="40" height="40"><rect stroke="black" fill="red" x="1" y="1" width="38" height="38"/><text x="20" y="25" font-size="12pt" font-family="arial" font-weight="bold" text-anchor="middle" fill="white">You</text></svg>',
@@ -214,6 +217,27 @@ export default function MadBusMap() {
     }
   }, [selectedRoute]);
 
+  const locate = useCallback(() => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const latlng: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+        userLatLngRef.current = latlng;
+        userMarkerRef.current?.setLatLng(latlng);
+        mapRef.current?.flyTo(latlng, 15, { duration: 1.5 });
+        setLocating(false);
+      },
+      (err) => {
+        setError(`Could not get location: ${err.message}`);
+        setLocating(false);
+      }
+    );
+  }, []);
+
   const clearRoute = useCallback(() => {
     setSelectedRoute("");
     stopsRef.current = [];
@@ -229,8 +253,9 @@ export default function MadBusMap() {
     let closest: StopFeature | undefined;
     let minDist = Infinity;
 
+    const [userLat, userLon] = userLatLngRef.current;
     for (const s of stops) {
-      const d = haversine(43.071302, -89.407001, s.attributes.stop_lat, s.attributes.stop_lon);
+      const d = haversine(userLat, userLon, s.attributes.stop_lat, s.attributes.stop_lon);
       if (d < minDist) {
         minDist = d;
         closest = s;
@@ -279,6 +304,13 @@ export default function MadBusMap() {
             Closest Stop
           </button>
         )}
+        <button
+          onClick={locate}
+          disabled={locating}
+          className="px-4 py-2 bg-zinc-600 text-white rounded hover:bg-zinc-700 disabled:opacity-50 ml-auto"
+        >
+          {locating ? "Locating…" : "📍 Locate Me"}
+        </button>
       </div>
 
       {error && (
