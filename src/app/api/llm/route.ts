@@ -1,10 +1,8 @@
 export const runtime = "edge";
 
-const ALLOWED_MODELS = new Set([
-  "gpt-5.4-mini", "gpt-5.5", "gpt-5.5-pro",
-  "claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-8",
-  "grok-build-0.1", "grok-4.20-0309-non-reasoning", "grok-4.3",
-]);
+import { PROVIDER_MODELS } from "../../llm/models";
+
+const ALLOWED_MODELS = new Set(Object.values(PROVIDER_MODELS).flat());
 
 // OpenAI and xAI share the same request/response format — only URL and key differ
 async function callOpenAICompatible(

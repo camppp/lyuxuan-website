@@ -5,24 +5,17 @@ import { PasswordGate } from "./PasswordGate";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { useChat } from "./useChat";
+import { PROVIDER_MODELS, type Provider } from "./models";
 
 const STORAGE_KEY = "llm_pw";
 
 const TIERS = ["快速", "旗舰", "顶配"] as const;
-
-const PROVIDER_MODELS = {
-  openai:    ["gpt-5.4-mini",              "gpt-5.5",           "gpt-5.5-pro"    ],
-  anthropic: ["claude-haiku-4-5-20251001", "claude-sonnet-4-6", "claude-opus-4-8"],
-  xai:       ["grok-build-0.1", "grok-4.20-0309-non-reasoning", "grok-4.3"],
-} as const;
 
 const PROVIDER_LABELS: Record<string, string> = {
   openai: "ChatGPT",
   anthropic: "Claude",
   xai: "Grok",
 };
-
-type Provider = keyof typeof PROVIDER_MODELS;
 
 function Chat({ savedPassword, onSignOut }: { savedPassword: string; onSignOut: () => void }) {
   const [provider, setProvider] = useState<Provider>("openai");
